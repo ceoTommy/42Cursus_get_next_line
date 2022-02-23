@@ -19,5 +19,6 @@
 void	*ft_calloc(size_t n_blocks, size_t size);
 size_t	ft_strlen(const char *str);
 char	*ft_strjoin(char const *s1, char const *s2);
+void	*ft_bzero(void *b, size_t len);
 
 #endif

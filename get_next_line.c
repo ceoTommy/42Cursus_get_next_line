@@ -6,7 +6,7 @@
 /*   By: tford <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 10:07:00 by tford             #+#    #+#             */
-/*   Updated: 2022/02/07 17:52:09 by tford            ###   ########.fr       */
+/*   Updated: 2022/02/20 14:56:54 by tford            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,46 +14,59 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-//remove me
-#include <stdio.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 //returns up to line end, then changes remainder to start at line end
-static char	*adjust_line(char **remainder)
+static char	*adjust_line(char **rem)
 {
-	size_t	i;
+	size_t	len;
 	size_t	j;
 	char	*line;
+	char	*tmp;
 
-	i = 0;
-	while((*remainder)[i] != '\n')
-		i++;
-	i++;
-	line = (char *) ft_calloc(i + 1, sizeof(char));
+	len = 0;
+	if (*rem == NULL || **rem == '\0')
+	{
+		return (NULL);
+	}
+	while ((*rem)[len] != '\n' && (*rem)[len] != '\0')
+		len++;
+	if ((*rem)[len] == '\n')
+		len++;
+	line = (char *) ft_calloc(len + 1, sizeof(char));
 	if (line == NULL)
 		return (NULL);
 	j = 0;
-	while (j < i)
+	while (j < len)
 	{
-		line[j] = (*remainder)[j];
+		line[j] = (*rem)[j];
 		j++;
 	}
-	*remainder = *remainder + i;
+	tmp = *rem;
+	*rem = ft_strjoin(NULL, tmp + len);
+	if (*rem == NULL)
+		return (NULL);
+	free (tmp);
 	return (line);
 }
 
 static int	str_isline(char *str)
 {
 	if (str == NULL)
-		return (0);
-	while (*str != '\n')
 	{
-		if (*str == '\0')
+		return (0);
+	}
+	while (*str)
+	{
+		if (*str == '\n')
 		{
-			return (0);
-		}	
+			return (1);
+		}
 		str++;
 	}
-	return (1);
+	return (0);
 }
 
 char	*get_next_line(int fd)
@@ -61,40 +74,47 @@ char	*get_next_line(int fd)
 	static char	*remainder;
 	char		*buf_str;
 	char		*tmp;
+	ssize_t		read_return;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
-	{
 		return (NULL);
-	}
 	buf_str = (char *) ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (buf_str == NULL)
-	{
 		return (NULL);
-	}
 	while (!str_isline(remainder))
 	{
-		if (read(fd, buf_str, BUFFER_SIZE) < 0)
+		read_return = read(fd, buf_str, BUFFER_SIZE);
+		if (read_return == -1)
+		{
+			free(buf_str);
 			return (NULL);
-		tmp = ft_strjoin(remainder, buf_str);
-		//free(buf_str);
-		remainder = tmp;
+		}
+		if (read_return == 0)
+			break;
+		buf_str[read_return] = '\0';
+		tmp = remainder;
+		remainder = ft_strjoin(tmp, buf_str);
+		if (tmp != NULL)
+			free(tmp);
 	}
+	//free(buf_str);
 	return (adjust_line(&remainder));
 }
 
 #include <fcntl.h>
 #include <stdio.h>
-int main(int ac, char **av)
+int	main()
 {
-	int fd = open(av[1], O_RDONLY);
+	int fd = open("testfile", O_RDONLY);
 	int	i;
 
-	if (ac <= 1)
-		printf("include file");
 	i = 0;
-	while (i < 3)
+	while (i < 12)
 	{
-		printf("[%s]", get_next_line(fd));
+		char *ptr = get_next_line(fd);
+		printf("%s", ptr);
+		//printf("%s = %p\n", ptr, ptr);
 		i++;
 	}
+	_CrtDumpMemoryLeaks();
 }

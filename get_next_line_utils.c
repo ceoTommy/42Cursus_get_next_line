@@ -6,25 +6,35 @@
 /*   By: tford <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 10:08:03 by tford             #+#    #+#             */
-/*   Updated: 2022/02/07 17:52:06 by tford            ###   ########.fr       */
+/*   Updated: 2022/02/20 14:46:49 by tford            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 #include <stdlib.h>
+
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+void	*ft_bzero(void *b, size_t len)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < len)
+		((unsigned char *) b)[i++] = 0;
+	return (b);
+}
 
 void	*ft_calloc(size_t n_blocks, size_t size)
 {
 	void	*p;
-	size_t	i;
 
 	p = malloc(n_blocks * size);
 	if (p != NULL)
 	{
-		i = 0;
-		while (i < size * n_blocks)
-			((unsigned char *)p)[i++] = 0;
+		ft_bzero(p, n_blocks * size);
 	}
 	return (p);
 }
