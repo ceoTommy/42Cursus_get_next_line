@@ -5,59 +5,69 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tford <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/02/02 10:07:00 by tford             #+#    #+#             */
-/*   Updated: 2022/02/20 14:56:54 by tford            ###   ########.fr       */
+/*   Created: 2022/02/26 12:36:41 by tford             #+#    #+#             */
+/*   Updated: 2022/03/02 12:48:52 by tford            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+static size_t	line_len(char *str);
 
-//returns up to line end, then changes remainder to start at line end
-static char	*adjust_line(char **rem)
+//returns upto end of line or the null
+//changes remainder to the remainding left
+static char	*line_move(char **rem)
 {
 	size_t	len;
-	size_t	j;
 	char	*line;
 	char	*tmp;
 
-	len = 0;
-	if (*rem == NULL || **rem == '\0')
-	{
-		return (NULL);
-	}
-	while ((*rem)[len] != '\n' && (*rem)[len] != '\0')
-		len++;
-	if ((*rem)[len] == '\n')
-		len++;
-	line = (char *) ft_calloc(len + 1, sizeof(char));
-	if (line == NULL)
-		return (NULL);
-	j = 0;
-	while (j < len)
-	{
-		line[j] = (*rem)[j];
-		j++;
-	}
-	tmp = *rem;
-	*rem = ft_strjoin(NULL, tmp + len);
 	if (*rem == NULL)
 		return (NULL);
-	free (tmp);
+	if (**rem == '\0')
+	{
+		free(*rem);
+		return (NULL);
+	}
+	len = line_len(*rem);
+	line = (char *) ft_calloc(len + 1, sizeof(char));
+	if (line == NULL)
+	{
+		return (NULL);
+	}
+	ft_strlcpy(line, *rem, len + 1);
+	tmp = *rem;
+	*rem = ft_strjoin(NULL, tmp + len);
+	free(tmp);
 	return (line);
 }
 
-static int	str_isline(char *str)
+//returns string length until a (inclusive)\n or (exclusive)\0
+static size_t	line_len(char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '\n')
+		{
+			i++;
+			break ;
+		}
+		i++;
+	}
+	return (i);
+}
+
+//returns true if the string has a /n in it
+static int	str_is_line(char *str)
 {
 	if (str == NULL)
-	{
 		return (0);
-	}
 	while (*str)
 	{
 		if (*str == '\n')
@@ -69,52 +79,48 @@ static int	str_isline(char *str)
 	return (0);
 }
 
+//reads a read_size amount from a fd
+//returns a new string of (src + read)
+static char	*read_join(int fd, const char *src, int read_size)
+{
+	char	*buf_str;
+	char	*joined;
+
+	buf_str = (char *) ft_calloc(read_size + 1, sizeof(char));
+	if (buf_str == NULL)
+		return (NULL);
+	if (read(fd, buf_str, read_size) <= 0)
+	{
+		free(buf_str);
+		return (NULL);
+	}
+	joined = ft_strjoin(src, buf_str);
+	free(buf_str);
+	return (joined);
+}
+
+//returns gets the next line from the file
+//until no lines left then it returns null
+//has a static remainder variable which holds the left over
 char	*get_next_line(int fd)
 {
 	static char	*remainder;
-	char		*buf_str;
 	char		*tmp;
-	ssize_t		read_return;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	buf_str = (char *) ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-	if (buf_str == NULL)
-		return (NULL);
-	while (!str_isline(remainder))
 	{
-		read_return = read(fd, buf_str, BUFFER_SIZE);
-		if (read_return == -1)
+		return (NULL);
+	}
+	while (!str_is_line(remainder))
+	{
+		tmp = read_join(fd, remainder, BUFFER_SIZE);
+		if (tmp == NULL)
 		{
-			free(buf_str);
-			return (NULL);
+			break ;
 		}
-		if (read_return == 0)
-			break;
-		buf_str[read_return] = '\0';
-		tmp = remainder;
-		remainder = ft_strjoin(tmp, buf_str);
-		if (tmp != NULL)
-			free(tmp);
+		if (remainder != NULL)
+			free(remainder);
+		remainder = tmp;
 	}
-	//free(buf_str);
-	return (adjust_line(&remainder));
-}
-
-#include <fcntl.h>
-#include <stdio.h>
-int	main()
-{
-	int fd = open("testfile", O_RDONLY);
-	int	i;
-
-	i = 0;
-	while (i < 12)
-	{
-		char *ptr = get_next_line(fd);
-		printf("%s", ptr);
-		//printf("%s = %p\n", ptr, ptr);
-		i++;
-	}
-	_CrtDumpMemoryLeaks();
+	return (line_move(&remainder));
 }

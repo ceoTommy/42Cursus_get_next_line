@@ -5,17 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tford <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/02/02 10:08:03 by tford             #+#    #+#             */
-/*   Updated: 2022/02/20 14:46:49 by tford            ###   ########.fr       */
+/*   Created: 2022/03/02 12:49:40 by tford             #+#    #+#             */
+/*   Updated: 2022/03/02 12:49:45 by tford            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdlib.h>
-
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
 
 void	*ft_bzero(void *b, size_t len)
 {
@@ -49,6 +45,25 @@ size_t	ft_strlen(const char *str)
 	while (str[i])
 		i++;
 	return (i);
+}
+
+size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
+{
+	size_t	i;
+
+	i = 0;
+	if (dstsize == 0)
+		return (ft_strlen(src));
+	while (src[i] && i < (dstsize - 1))
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	if (i < dstsize)
+	{
+		dst[i] = '\0';
+	}
+	return (ft_strlen(src));
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
