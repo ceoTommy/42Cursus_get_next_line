@@ -16,7 +16,4 @@ Only handles ascii decimal characters.
 4. Compile get_next_line.c, get_next_line_utils.c and your program 4
 
 ### 42 Info
-PASSED WITH 100%
-
-42 GRADS: 100%
-{: .alert .alert-success}
+🟢 PASSED WITH 100%
