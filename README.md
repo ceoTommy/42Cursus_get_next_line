@@ -5,15 +5,15 @@
 To read the next lines on every function call a static variables is used. All memory is free'd once get_next_line reaches the end of file in which it will return NULL.
 
 ## Limitations
-Won't handle different file discriptors as inputs throught the program until NULL is returned
+Undefined return with alternaing file discriptors, NULL must be a return before changing file descriptors
 
 Only handles ascii decimal characters.
 
 ## Use
-1. Clone the project into your working directory 1
-2. `#include "get_next_line.h` as a header in your C program 2
-3. Use the funstion in your program `get_next_line(int fd)` 3
-4. Compile get_next_line.c, get_next_line_utils.c and your program 4
+1. Clone the project into your working directory
+2. `#include "get_next_line.h` as a header in your C program
+3. Use the function in your program `get_next_line(int fd)`
+4. Compile get_next_line.c, get_next_line_utils.c and your program
 
-### 42 Info
+## 42_GRADE
 🟢 PASSED WITH 100%
