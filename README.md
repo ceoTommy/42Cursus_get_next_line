@@ -1,5 +1,4 @@
 # Get_next_line
-### Now included in my Libft libary
 `char * get_next_line(int fd)`
 ## Functionality
 Returns a string given a file descriptor. This function can be repeatadly used to continuously return the next lines in the file. To get the file descriptor (fd) use the [open](https://man7.org/linux/man-pages/man2/open.2.html) function found in the *fcntl.h* system libary.
@@ -16,6 +15,9 @@ Only handles ascii decimal characters.
 2. `#include "get_next_line.h` as a header in your C program
 3. Use the function in your program `get_next_line(int fd)`
 4. Compile get_next_line.c, get_next_line_utils.c and your program
+
+## Updates
+*Updated to be included in my Libft libary*
 
 ## 42_GRADE
 🟢 PASSED WITH 100%
