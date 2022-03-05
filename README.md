@@ -5,3 +5,5 @@ To read the next lines on every function call a static variables is used. All me
 
 **LIBARY**
 #include "get_next_line.h"
+
+PASSED WITH 100%
